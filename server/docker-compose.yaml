@@ -58,3 +58,8 @@ services:
       - .:/opt/app
     depends_on:
       - db
+
+  ubuntu:
+    image: ubuntu:latest
+    container_name: ubuntu
+    command: sleep 1000d
