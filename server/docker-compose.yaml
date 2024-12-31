@@ -5,13 +5,14 @@ services:
     container_name: extension-server
     build:
       context: .
-      dockerfile: Dockerfile
+      dockerfile: Dockerfile.dev
     env_file:
       - .env
     volumes:
       - .:/opt/app
     depends_on:
       - db
+      - migrate
     ports:
       - "3000:3000"
 
@@ -43,5 +44,17 @@ services:
       ME_CONFIG_MONGODB_URL: ${DB_CONNECTION_STRING}
     ports:
       - 8081:8081
+    depends_on:
+      - db
+
+  migrate:
+    container_name: extension-migrate
+    build:
+      context: .
+      dockerfile: Dockerfile.migrate
+    env_file:
+      - .env
+    volumes:
+      - .:/opt/app
     depends_on:
       - db
