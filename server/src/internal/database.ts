@@ -1,17 +1,16 @@
 import { MongoClient } from "mongodb";
-import { APP_NAME } from "../config/app-config";
+import {
+  APP_NAME,
+  DATABASE_NAME,
+  MONGO_DB_KEY_VAULT_NAMESPACE,
+} from "../config/app-config";
+import { getKmsProvider } from "../utils/cryptography";
 
-export interface DataBase<T> {
-  connect(): Promise<void>;
-  disconnect(): Promise<void>;
-  dbm: T;
-}
+export default class MongoDbDatabase {
+  private static _client: MongoClient;
 
-export default class MongoDbDatabase implements DataBase<MongoClient> {
-  private readonly _client: MongoClient;
-
-  constructor(uri: string) {
-    this._client = new MongoClient(uri, {
+  public static async instantiate(uri: string) {
+    const client = new MongoClient(uri, {
       appName: APP_NAME,
       retryWrites: true,
       w: "majority",
@@ -20,17 +19,69 @@ export default class MongoDbDatabase implements DataBase<MongoClient> {
       writeConcern: { w: "majority", wtimeout: 10000 },
       connectTimeoutMS: 30000,
     });
+
+    const [dbName, keyVaultName] = MONGO_DB_KEY_VAULT_NAMESPACE.split(".");
+    if (!dbName || !keyVaultName) {
+      throw new Error("Invalid key vault namespace");
+    }
+
+    const doc = await client
+      .db(dbName)
+      .collection(keyVaultName)
+      .findOne({ keyAltNames: { $exists: true } });
+
+    const schemaMap = {
+      [`${DATABASE_NAME}.'user-accounts'`]: {
+        bsonType: "object",
+        properties: {
+          cardNumber: {
+            encrypt: {
+              bsonType: "string",
+              algorithm: "AEAD_AES_256_CBC_HMAC_SHA_512-Deterministic", // Deterministic encryption
+              keyId: [doc?._id], // Use generated DEK
+            },
+          },
+          pin: {
+            encrypt: {
+              bsonType: "string",
+              algorithm: "AEAD_AES_256_CBC_HMAC_SHA_512-Random", // Random encryption
+              keyId: [doc?._id], // Use generated DEK
+            },
+          },
+        },
+      },
+    };
+    // Close the client
+    await client.close();
+
+    // Create a new client with auto-encryption
+    const secureClient = new MongoClient(uri, {
+      appName: APP_NAME,
+      retryWrites: true,
+      w: "majority",
+      readPreference: "primary",
+      readConcern: { level: "majority" },
+      writeConcern: { w: "majority", wtimeout: 10000 },
+      connectTimeoutMS: 30000,
+      autoEncryption: {
+        keyVaultNamespace: MONGO_DB_KEY_VAULT_NAMESPACE,
+        kmsProviders: await getKmsProvider(),
+        schemaMap,
+      },
+    });
+
+    this._client = secureClient;
   }
 
-  public async connect(): Promise<void> {
+  public static async connect(): Promise<void> {
     await this._client.connect();
   }
 
-  public async disconnect(): Promise<void> {
+  public static async disconnect(): Promise<void> {
     await this._client.close();
   }
 
-  public get dbm(): MongoClient {
+  public static get dbm(): MongoClient {
     return this._client;
   }
 }

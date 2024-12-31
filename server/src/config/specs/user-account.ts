@@ -25,6 +25,15 @@ const CreateUserAccountPayload = {
   },
 };
 
+const GetUserCardInfoPayload = {
+  type: "object",
+  properties: {
+    cardNumber: { type: "string" },
+    pin: { type: "string" },
+  },
+};
+
 export default {
   CreateUserAccountPayload,
+  GetUserCardInfoPayload,
 };

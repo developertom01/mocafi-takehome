@@ -1,8 +1,8 @@
 version: "3.9"
 
 services:
-  extension-server:
-    container_name: extension-server
+  app:
+    container_name: server
     build:
       context: .
       dockerfile: Dockerfile.dev
@@ -18,13 +18,11 @@ services:
 
   db:
     image: mongo:4.4.27
-    container_name: extension-db
+    container_name: application-db
     restart: always
     environment:
       MONGO_INITDB_ROOT_USERNAME: root
       MONGO_INITDB_ROOT_PASSWORD: example
-      MONGO_INITDB_DATABASE: extension
-      REPLICATION_MODE: standalone
 
     ports:
       - 27017:27017

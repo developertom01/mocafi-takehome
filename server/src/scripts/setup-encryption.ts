@@ -1,6 +1,6 @@
 import { MongoClient, ClientEncryption } from "mongodb";
 import { Logger } from "../internal/logger";
-import { getEncryptionMastKey } from "../utils/cryptography";
+import { getEncryptionMastKey, getKmsProvider } from "../utils/cryptography";
 import { APP_ENV, DATA_KEY_FIELD_NAME } from "../config/app-config";
 
 // Create Key Vault and Data Encryption Key
@@ -10,7 +10,7 @@ export async function setupLocalEncryptionVault(
   keyVaultNamespace: string,
   logger: Logger
 ) {
-  let masterKey: string | undefined;
+  let masterKey: Buffer | undefined;
   try {
     masterKey = await getEncryptionMastKey(masterKeyPath);
   } catch (error) {
@@ -20,18 +20,6 @@ export async function setupLocalEncryptionVault(
     );
     return;
   }
-
-  const kmsProviders = {
-    local: {
-      key: masterKey!,
-    },
-    // Setup other vault for production. egg. Azure Key Vault or AWS KMS
-    // azure: {
-    //     tenantId: "myTenant",
-    //     clientId: "myClient",
-    //     clientSecret: "mySecret",
-    // },
-  };
 
   try {
     // Step 1: Create Key Vault Index
@@ -56,7 +44,7 @@ export async function setupLocalEncryptionVault(
     // Step 2: Create Data Encryption Key (DEK)
     const clientEncryption = new ClientEncryption(client, {
       keyVaultNamespace,
-      kmsProviders,
+      kmsProviders: await getKmsProvider(),
     });
 
     // Check if DEK already exists

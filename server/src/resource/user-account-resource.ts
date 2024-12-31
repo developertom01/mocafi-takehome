@@ -9,7 +9,7 @@ export type UserType = {
 
 export type AccountType = {
   cardNumber: string;
-  expiration: Date;
+  expiration: string;
   balance: number;
 };
 
@@ -24,7 +24,7 @@ export class UserAccountResource implements Resource<UserAccountType> {
 
   public toJSON(): UserAccountType {
     return {
-      id: this.userAccount._id.toHexString(),
+      id: this.userAccount._id!.toHexString(),
       user: {
         phone: this.userAccount.user.phone,
         firstName: this.userAccount.user.firstName,
@@ -32,7 +32,7 @@ export class UserAccountResource implements Resource<UserAccountType> {
       },
       account: {
         cardNumber: this.userAccount.account.cardNumber,
-        expiration: this.userAccount.account.expiration,
+        expiration: this.userAccount.account.expiration.toISOString(),
         balance: this.userAccount.account.balance,
       },
     };

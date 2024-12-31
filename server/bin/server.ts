@@ -1,5 +1,4 @@
-import { MongoClient } from "mongodb";
-import MongoDbDatabase, { DataBase } from "../src/internal/database";
+import MongoDbDatabase from "../src/internal/database";
 import { appLogger } from "../src/internal/logger";
 import { DATABASE_URL, PORT } from "../src/config/app-config";
 import { ExpressRestServer, RestServer } from "../src/internal/rest-server";
@@ -12,22 +11,27 @@ import { setupController } from "../src/controller";
 import { AsyncLocalStorage } from "async_hooks";
 import { LocalStorage } from "../src/utils/types";
 
-let database: DataBase<MongoClient> | undefined;
 let restServer: RestServer<Application> | undefined;
 
 let localStorage: AsyncLocalStorage<LocalStorage>;
 
 async function main() {
   localStorage = new AsyncLocalStorage<LocalStorage>();
-  database = new MongoDbDatabase(DATABASE_URL!);
 
-  appLogger.info("Connecting to database...");
-  await database.connect();
+  if (!DATABASE_URL) {
+    throw new Error("DATABASE_URL is not defined");
+  }
+
+  await MongoDbDatabase.instantiate(DATABASE_URL);
+  appLogger.info("Initialized database...");
+
+  await MongoDbDatabase.connect();
+  appLogger.info("Connected to database...");
 
   appLogger.info("Setting up controller");
-  const controller = setupController(database, appLogger);
+  const controller = setupController(MongoDbDatabase.dbm, appLogger);
 
-  const routes = registerRestRoutes(controller, localStorage, appLogger);
+  const routes = registerRestRoutes(controller, appLogger);
 
   restServer = new ExpressRestServer(routes, localStorage, appLogger);
 
@@ -48,8 +52,8 @@ async function main() {
   // Cleanup
   process.on("SIGINT", async () => {
     appLogger.info("Shutting down server...");
-    if (database) {
-      await database.disconnect();
+    if (MongoDbDatabase.dbm) {
+      await MongoDbDatabase.disconnect();
     }
     appLogger.info("Database connection closed.");
     process.exit(0);
@@ -62,8 +66,8 @@ async function main() {
 }
 
 main().catch((err) => {
-  if (database) {
-    database.disconnect().then(() => {
+  if (MongoDbDatabase.dbm) {
+    MongoDbDatabase.disconnect().then(() => {
       appLogger.info("Database connection closed.");
     });
   }
