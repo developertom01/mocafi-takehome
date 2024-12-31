@@ -1,0 +1,60 @@
+version: "3.9"
+
+services:
+  extension-server:
+    container_name: extension-server
+    build:
+      context: .
+      dockerfile: Dockerfile.dev
+    env_file:
+      - .env
+    volumes:
+      - .:/opt/app
+    depends_on:
+      - db
+      - migrate
+    ports:
+      - "3000:3000"
+
+  db:
+    image: mongo:4.4.27
+    container_name: extension-db
+    restart: always
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: root
+      MONGO_INITDB_ROOT_PASSWORD: example
+      MONGO_INITDB_DATABASE: extension
+      REPLICATION_MODE: standalone
+
+    ports:
+      - 27017:27017
+    healthcheck:
+      test: ["CMD", "mongo", "--eval", "db.adminCommand('ping')"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  mongo-express:
+    image: mongo-express
+    restart: always
+    container_name: mongo-express
+    environment:
+      ME_CONFIG_MONGODB_ADMINUSERNAME: root
+      ME_CONFIG_MONGODB_ADMINPASSWORD: example
+      ME_CONFIG_MONGODB_URL: ${DB_CONNECTION_STRING}
+    ports:
+      - 8081:8081
+    depends_on:
+      - db
+
+  migrate:
+    container_name: extension-migrate
+    build:
+      context: .
+      dockerfile: Dockerfile.migrate
+    env_file:
+      - .env
+    volumes:
+      - .:/opt/app
+    depends_on:
+      - db
