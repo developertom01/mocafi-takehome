@@ -3,8 +3,6 @@ import { appLogger } from "../src/internal/logger";
 import { DATABASE_URL, PORT } from "../src/config/app-config";
 import { ExpressRestServer, RestServer } from "../src/internal/rest-server";
 import { Application } from "express";
-import http from "http";
-import pinoHttp from "pino-http";
 
 import { registerRestRoutes } from "../src/app/rest";
 import { setupController } from "../src/controller";
@@ -25,6 +23,7 @@ async function main() {
   await MongoDbDatabase.instantiate(DATABASE_URL);
   appLogger.info("Initialized database...");
 
+  appLogger.info("Connecting to database...");
   await MongoDbDatabase.connect();
   appLogger.info("Connected to database...");
 
@@ -35,14 +34,11 @@ async function main() {
 
   restServer = new ExpressRestServer(routes, localStorage, appLogger);
 
-  const server = http.createServer(restServer.app);
-  restServer.app.use(pinoHttp());
-
   appLogger.info("Setting up rest routes...");
 
   appLogger.info("Starting server...");
   await new Promise((resolve) => {
-    server.listen(PORT, () => {
+    restServer!.app.listen(PORT, () => {
       resolve(undefined);
     });
   });

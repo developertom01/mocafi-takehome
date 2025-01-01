@@ -10,7 +10,7 @@ export async function setupLocalEncryptionVault(
   keyVaultNamespace: string,
   logger: Logger
 ) {
-  let masterKey: Buffer | undefined;
+  let masterKey: string | undefined;
   try {
     masterKey = await getEncryptionMastKey(masterKeyPath);
   } catch (error) {

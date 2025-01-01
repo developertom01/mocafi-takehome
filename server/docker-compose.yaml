@@ -17,7 +17,7 @@ services:
       - "3000:3000"
 
   db:
-    image: mongo:4.4.27
+    image: mongo:7.0.0
     container_name: application-db
     restart: always
     environment:

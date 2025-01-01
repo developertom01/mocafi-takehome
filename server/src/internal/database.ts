@@ -38,14 +38,12 @@ export default class MongoDbDatabase {
             encrypt: {
               bsonType: "string",
               algorithm: "AEAD_AES_256_CBC_HMAC_SHA_512-Deterministic", // Deterministic encryption
-              keyId: [doc?._id], // Use generated DEK
+              keyId: [doc!._id.toString("hex")], // Use generated DEK
             },
           },
         },
       },
     };
-    // Close the client
-    await client.close();
 
     // Create a new client with auto-encryption
     const secureClient = new MongoClient(uri, {
@@ -55,9 +53,8 @@ export default class MongoDbDatabase {
       readPreference: "primary",
       readConcern: { level: "majority" },
       writeConcern: { w: "majority", wtimeout: 10000 },
-      connectTimeoutMS: 30000,
       autoEncryption: {
-        keyVaultNamespace: MONGO_DB_KEY_VAULT_NAMESPACE,
+        bypassAutoEncryption: true,
         kmsProviders: await getKmsProvider(),
         schemaMap,
       },

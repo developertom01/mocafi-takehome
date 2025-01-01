@@ -4,14 +4,14 @@ FROM node:20-slim
 WORKDIR /opt/app
 
 # Required for prisma to run
-RUN apt-get update && apt-get install -y openssl && apt-get clean && rm -rf /var/lib/apt/lists/*
+RUN apt-get update && apt-get install -y openssl libmongocrypt-dev && apt-get clean && rm -rf /var/lib/apt/lists/*
 
 # Copy package.json and package-lock.json
 COPY package.json ./package.json
 COPY package-lock.json ./package-lock.json
 
 # Install dependencies
-RUN npm install
+RUN npm install 
 
 # Copy the rest of the application code
 COPY ./bin ./bin

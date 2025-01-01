@@ -32,7 +32,7 @@ export async function getEncryptionMastKey(filePath: string) {
     throw new Error("Encryption master key not found");
   }
 
-  const key = await fs.readFile(filePath);
+  const key = await fs.readFile(filePath, "base64");
 
   return key;
 }
