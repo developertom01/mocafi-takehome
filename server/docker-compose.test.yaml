@@ -1,0 +1,41 @@
+version: "3.9"
+
+services:
+  app:
+    container_name: server
+    build:
+      context: .
+      dockerfile: Dockerfile.test
+    env_file:
+      - .env.test
+    volumes:
+      - .:/opt/app
+    depends_on:
+      - test-db
+      - migrate
+
+  test-db:
+    image: mongo:4.4.27
+    container_name: application-db
+    restart: always
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: root
+      MONGO_INITDB_ROOT_PASSWORD: example
+
+    healthcheck:
+      test: ["CMD", "mongo", "--eval", "db.adminCommand('ping')"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  migrate:
+    container_name: extension-migrate
+    build:
+      context: .
+      dockerfile: Dockerfile.migrate
+    env_file:
+      - .env
+    volumes:
+      - .:/opt/app
+    depends_on:
+      - db
