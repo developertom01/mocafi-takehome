@@ -8,7 +8,7 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
   ({ children, className = "", ...props }, ref) => {
     return (
       <button
-        className={`border-none bg-[#C71949] transition duration-200 hover:bg-[#f182a2] text-white px-2 py-3 disabled:bg-[#5f2f3c] disabled:cursor-not-allowed rounded-md ${className}`}
+        className={`border-none bg-[#5F717D] transition duration-200 hover:bg-[#4d585f] text-white px-2 py-3 disabled:bg-[#5f2f3c] disabled:cursor-not-allowed rounded-md ${className}`}
         {...props}
         ref={ref}
       >

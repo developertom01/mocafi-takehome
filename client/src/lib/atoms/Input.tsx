@@ -14,7 +14,7 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(
         <label className="w-[30%]">{label}</label>
         <div className="w-full flex flex-col">
           <input
-            className={`w-full border border-[#dd7e99] disabled:border-gray-600 disabled:bg-gray-200 disabled:cursor-not-allowed focus:outline-none px-2 py-3  rounded-md ${className}`}
+            className={`w-full border transition-colors duration-300 focus:border-[#8ca6b7] border-[#5F717D] disabled:border-gray-600 disabled:bg-gray-200 disabled:cursor-not-allowed focus:outline-none px-2 py-3  rounded-md ${className}`}
             ref={ref}
             {...props}
           />

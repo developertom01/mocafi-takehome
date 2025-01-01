@@ -1,28 +1,27 @@
 import React from "react";
 import Input from "../../lib/atoms/Input";
 import { useForm } from "react-hook-form";
-import { getAccountInformation, GetUserAccountInformationPayload } from "../../services/user-account.services";
+import {
+  getAccountInformation,
+  GetUserAccountInformationPayload,
+} from "../../services/user-account.services";
 import { Button } from "../../lib/atoms";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { useNavigate, useSearchParams } from "react-router-dom";
 
 // 16 digits
 const CARD_NUMBER_REGEX = /^\d{16}$/;
 const PIN_REGEX = /^\d{4}$/;
 
 const LoginForm = () => {
-  const [searchParams] = useSearchParams();
-  const navigate = useNavigate();
   const queryClient = useQueryClient();
 
-
-  const {mutate, isSuccess, isPending } = useMutation({
+  const { mutate, isPending } = useMutation({
     mutationFn: getAccountInformation,
     mutationKey: ["user-account-info"],
     onSuccess(data) {
       queryClient.setQueryData(["user-account-info"], data);
     },
-  })
+  });
 
   const {
     register,
@@ -31,16 +30,8 @@ const LoginForm = () => {
   } = useForm<GetUserAccountInformationPayload>();
 
   const onSubmit = (data: GetUserAccountInformationPayload) => {
-    mutate(data)
-
-  }
-
-  if (isSuccess) {
-
-    const redirectUrl = searchParams.get("redirect") ??`/dashboard/
-    `;
-    navigate(redirectUrl);
-  }
+    mutate(data);
+  };
 
   return (
     <form
@@ -51,14 +42,15 @@ const LoginForm = () => {
         label="Account Number"
         type="password"
         className="rounded-md"
-        placeholder="tom@email.com"
+        placeholder="12345678991234567"
         error={errors.cardNumber?.message}
         {...register("cardNumber", {
           required: true,
-          validate: (value) => CARD_NUMBER_REGEX.test(value) || "Enter a valid card number",
+          validate: (value) =>
+            CARD_NUMBER_REGEX.test(value) || "Enter a valid card number",
         })}
       />
-        <Input
+      <Input
         label="Pin"
         type="password"
         className="rounded-md"
