@@ -45,10 +45,6 @@ export class ExpressRestServer implements RestServer<Application> {
 
     this._app.use("/api", apiRouter);
     this._app.use("/api-doc", swaggerUi.serve, swaggerUi.setup(swaggerConfig));
-    this._app.use((err: Error, _: any, res: any, __: NextFunction) => {
-      this.logger.error(err);
-      res.status(500).send("Something broke!");
-    });
   }
 
   public get app() {
