@@ -9,10 +9,10 @@ function registerUserRoutes(controller: Controller, logger: Logger) {
   const router = Router();
 
   /**
-   * @api {post} /users-account-info Get user account info
+   * @api {post} /user-accounts/info Get user account info
    *
    * @swagger
-   * /info:
+   * /user-accounts/info:
    *  post:
    *    summary: Get user account info
    *    description: Get user account info

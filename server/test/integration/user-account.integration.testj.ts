@@ -13,7 +13,7 @@ import { registerRestRoutes } from "../../src/app/rest";
 import { ExpressRestServer } from "../../src/internal/rest-server";
 import { UserAccount } from "../../src/controller/user-accounts";
 import { hash } from "../../src/utils/cryptography";
-import { mockedLogger } from "../../src/utils/test-utils";
+import { getMockedCache, mockedLogger } from "../../src/utils/test-utils";
 
 describe("User Account Integration Test", () => {
   beforeEach(async () => {
@@ -21,8 +21,14 @@ describe("User Account Integration Test", () => {
     await MongoDbDatabase.instantiate(DATABASE_URL!);
     mockedLogger.info("Initialized database...");
 
+    const cahce = getMockedCache();
+
     await MongoDbDatabase.connect();
-    const controller = setupController(MongoDbDatabase.dbm, mockedLogger);
+    const controller = setupController(
+      MongoDbDatabase.dbm,
+      cahce,
+      mockedLogger
+    );
 
     const routes = registerRestRoutes(controller, mockedLogger);
 
@@ -69,9 +75,7 @@ describe("User Account Integration Test", () => {
       .db(DATABASE_NAME)
       .collection("user-accounts")
       .insertOne(payload);
-
-    //
-
+      
     await request(app).get("/user-account/info").expect(200);
   });
 });

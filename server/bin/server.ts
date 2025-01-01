@@ -3,11 +3,13 @@ import { appLogger } from "../src/internal/logger";
 import { DATABASE_URL, PORT } from "../src/config/app-config";
 import { ExpressRestServer, RestServer } from "../src/internal/rest-server";
 import { Application } from "express";
+import { pinoHttp } from "pino-http";
 
 import { registerRestRoutes } from "../src/app/rest";
 import { setupController } from "../src/controller";
 import { AsyncLocalStorage } from "async_hooks";
 import { LocalStorage } from "../src/utils/types";
+import { getCacheFactory } from "../src/internal/cache";
 
 let restServer: RestServer<Application> | undefined;
 
@@ -15,6 +17,7 @@ let localStorage: AsyncLocalStorage<LocalStorage>;
 
 async function main() {
   localStorage = new AsyncLocalStorage<LocalStorage>();
+  const cache = getCacheFactory()!;
 
   if (!DATABASE_URL) {
     throw new Error("DATABASE_URL is not defined");
@@ -28,11 +31,12 @@ async function main() {
   appLogger.info("Connected to database...");
 
   appLogger.info("Setting up controller");
-  const controller = setupController(MongoDbDatabase.dbm, appLogger);
+  const controller = setupController(MongoDbDatabase.dbm, cache, appLogger);
 
   const routes = registerRestRoutes(controller, appLogger);
 
   restServer = new ExpressRestServer(routes, localStorage, appLogger);
+  restServer.app.use(pinoHttp());
 
   appLogger.info("Setting up rest routes...");
 

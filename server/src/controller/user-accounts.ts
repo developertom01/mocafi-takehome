@@ -6,9 +6,15 @@ import { APP_SECRET, DATABASE_NAME } from "../config/app-config";
 import { handleDataLayerError } from "./util";
 import { ValidationError } from "../errors/validation-error";
 import { NotFoundError } from "../errors/not-found";
-import { hash, verifyHash } from "../utils/cryptography";
+import {
+  decryptField,
+  encryptField,
+  hash,
+  verifyHash,
+} from "../utils/cryptography";
 import { UnauthorizedError } from "../errors/Unauthorized-error";
 import UserAccountResource from "../resource/user-account-resource";
+import { Cache } from "../internal/cache";
 
 const USER_ACCOUNT_COLLECTION_NAME = "user-accounts";
 
@@ -72,6 +78,7 @@ export interface UserAccountControllerType {
 export class UserAccountController implements UserAccountControllerType {
   constructor(
     private readonly db: MongoClient,
+    private readonly cache: Cache,
     private readonly logger: Logger
   ) {}
 
@@ -102,6 +109,11 @@ export class UserAccountController implements UserAccountControllerType {
         throw new UnauthorizedError("Invalid pin");
       }
 
+      userAccount.account.cardNumber = await decryptField(
+        this.db,
+        userAccount.account.cardNumber
+      );
+
       return new UserAccountResource(userAccount);
     } catch (error) {
       this.logger.error(
@@ -129,6 +141,11 @@ export class UserAccountController implements UserAccountControllerType {
     const { user, account } = data;
 
     account.pin = hash(account.pin, APP_SECRET!);
+    account.cardNumber = await encryptField(
+      this.db,
+      this.cache,
+      account.cardNumber
+    );
     account.expiration.setHours(23, 59, 59, 999); // Set to end of day
 
     const userAccount: UserAccount = {

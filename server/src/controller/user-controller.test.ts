@@ -4,13 +4,13 @@ import {
   UserAccount,
   UserAccountController,
 } from "./user-accounts";
-import { mockedLogger } from "../utils/test-utils";
+import { getMockedCache, mockedLogger } from "../utils/test-utils";
 import { ValidationError } from "../errors/validation-error";
 import { hash } from "../utils/cryptography";
-import { APP_SECRET } from "../config/app-config";
+import { APP_SECRET, DATA_KEY_FIELD_NAME } from "../config/app-config";
 import UserAccountResource from "../resource/user-account-resource";
 
-describe("Test user conroller", () => {
+describe("Test user controller", () => {
   beforeEach(() => {
     // @ts-expect-error - this is a mock
     const mockedDatabaseInstance: MongoClient = {
@@ -22,12 +22,15 @@ describe("Test user conroller", () => {
       }),
     };
 
+    const cache = getMockedCache();
+
     const controller = new UserAccountController(
       mockedDatabaseInstance,
+      cache,
       mockedLogger
     );
 
-    expect.setState({ controller, mockedDatabaseInstance });
+    expect.setState({ controller, cache, mockedDatabaseInstance });
   });
 
   afterEach(() => {
@@ -36,7 +39,11 @@ describe("Test user conroller", () => {
 
   describe("Test create user account", () => {
     test("should create user account", async () => {
-      const { controller, mockedDatabaseInstance } = expect.getState();
+      const { controller, mockedDatabaseInstance, cache } = expect.getState();
+
+      // Set keyid in cahce
+      cache.set(DATA_KEY_FIELD_NAME, "keyid");
+
       // Arrange
       const now = new Date();
       const expiryDate = new Date(now);
