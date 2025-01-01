@@ -2,6 +2,12 @@ import React from "react";
 import Modal from "../../lib/components/Modal";
 import { UserAccount } from "../../lib/models";
 import logo from "../../lib/images/logo.jpg";
+import {
+  CreditCardIcon,
+  PhoneIcon,
+  CalendarDateRangeIcon,
+  CurrencyDollarIcon,
+} from "@heroicons/react/24/outline";
 
 type Props = {
   userAccount?: UserAccount;
@@ -31,23 +37,31 @@ const AccountInformationModal: React.FC<Props> = ({
           </div>
           <div className="flex gap-x-6">
             <p className="text-gray-600"> Phone:</p>
-            <p>{userAccount?.user.phone}</p>
+            <p className="flex items-center gap-x-2">
+              <PhoneIcon className="w-4 h-4" />
+              {userAccount?.user.phone}
+            </p>
           </div>
           <div className="flex gap-x-6">
             <p className="text-gray-600"> Card Number:</p>
-            <p>{userAccount?.account.cardNumber}</p>
+            <p className="flex gap-x-2 items-center">
+              <CreditCardIcon className="w-4 h-4" />
+              {userAccount?.account.cardNumber}
+            </p>
           </div>
           <div className="flex gap-x-6">
             <p className="text-gray-600"> Balance</p>
-            <p>$ {userAccount?.account.balance}</p>
-          </div>
-          <div className="flex gap-x-6">
-            <p className="text-gray-600"> Expiration:</p>
-            <p>{userAccount?.account.cardNumber}</p>
+            <p className="flex gap-x-2 items-center">
+              <CurrencyDollarIcon className="w-4 h-4" /> $
+              {userAccount?.account.balance}
+            </p>
           </div>
           <div className="flex gap-x-6">
             <p className="text-gray-600"> Expiration</p>
-            <p>{userAccount?.account.expiration}</p>
+            <p className="flex gap-x-2 items-center">
+              <CalendarDateRangeIcon className="w-4 h-4" />
+              {userAccount?.account.expiration}
+            </p>
           </div>
         </div>
       </div>
