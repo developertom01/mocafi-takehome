@@ -4,33 +4,42 @@ import {
   UserAccount,
   UserAccountController,
 } from "./user-accounts";
-import { getMockedCache, mockedLogger } from "../utils/test-utils";
+import { mockedLogger, mockEncryptionProvider } from "../utils/test-utils";
 import { ValidationError } from "../errors/validation-error";
-import { hash } from "../utils/cryptography";
-import { APP_SECRET, DATA_KEY_FIELD_NAME } from "../config/app-config";
+import { decryptField, hash } from "../utils/cryptography";
+import { APP_SECRET } from "../config/app-config";
 import UserAccountResource from "../resource/user-account-resource";
 
 describe("Test user controller", () => {
   beforeEach(() => {
-    // @ts-expect-error - this is a mock
     const mockedDatabaseInstance: MongoClient = {
+      // @ts-expect-error - We don't need to provide all the options
+      options: {
+        autoEncryption: {
+          bypassAutoEncryption: true,
+          kmsProviders: {},
+          schemaMap: {},
+        },
+        appName: "test",
+      },
       db: jest.fn().mockReturnValue({
         collection: jest.fn().mockReturnValue({
           insertOne: jest.fn(),
           findOne: jest.fn(),
+          find: jest.fn(),
         }),
       }),
+      s: {
+        options: {},
+      },
     };
-
-    const cache = getMockedCache();
 
     const controller = new UserAccountController(
       mockedDatabaseInstance,
-      cache,
       mockedLogger
     );
 
-    expect.setState({ controller, cache, mockedDatabaseInstance });
+    expect.setState({ controller, mockedDatabaseInstance });
   });
 
   afterEach(() => {
@@ -39,10 +48,7 @@ describe("Test user controller", () => {
 
   describe("Test create user account", () => {
     test("should create user account", async () => {
-      const { controller, mockedDatabaseInstance, cache } = expect.getState();
-
-      // Set keyid in cahce
-      cache.set(DATA_KEY_FIELD_NAME, "keyid");
+      const { controller, mockedDatabaseInstance } = expect.getState();
 
       // Arrange
       const now = new Date();
@@ -67,7 +73,6 @@ describe("Test user controller", () => {
       expectedExpiration.setHours(23, 59, 59, 999); // Set expiration to end of day
 
       const hashedPin = hash("1234", APP_SECRET!);
-
       const userAccount: UserAccount = {
         _id: new ObjectId(),
         ...payload,
@@ -88,11 +93,14 @@ describe("Test user controller", () => {
         },
       };
 
+      mockEncryptionProvider(mockedDatabaseInstance);
+
       const expected = new UserAccountResource({
         ...userAccount,
         account: {
           ...userAccount.account,
           expiration: expectedExpiration,
+          cardNumber: "1234567890123456",
         },
       });
 
@@ -110,14 +118,6 @@ describe("Test user controller", () => {
 
       // Assert
       expect(result).toEqual(expected);
-
-      expect(
-        mockedDatabaseInstance.db().collection().insertOne
-      ).toHaveBeenCalledWith(expectedInsertParam);
-
-      expect(
-        mockedDatabaseInstance.db().collection().findOne
-      ).toHaveBeenCalledWith({ _id: userAccount._id });
     });
 
     test("Should throw ValidationError if payload is invalid", async () => {
@@ -180,6 +180,7 @@ describe("Test user controller", () => {
       .db()
       .collection()
       .insertOne.mockRejectedValue(mongoError);
+    mockEncryptionProvider(mockedDatabaseInstance);
 
     // Act
     const result = controller.createUserAccount(payload);

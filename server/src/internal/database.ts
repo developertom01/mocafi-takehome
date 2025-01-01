@@ -6,6 +6,7 @@ import {
 } from "../config/app-config";
 import { getKmsProvider } from "../utils/cryptography";
 
+
 export default class MongoDbDatabase {
   private static _client: MongoClient;
 

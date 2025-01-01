@@ -9,7 +9,6 @@ import { registerRestRoutes } from "../src/app/rest";
 import { setupController } from "../src/controller";
 import { AsyncLocalStorage } from "async_hooks";
 import { LocalStorage } from "../src/utils/types";
-import { getCacheFactory } from "../src/internal/cache";
 
 let restServer: RestServer<Application> | undefined;
 
@@ -17,7 +16,6 @@ let localStorage: AsyncLocalStorage<LocalStorage>;
 
 async function main() {
   localStorage = new AsyncLocalStorage<LocalStorage>();
-  const cache = getCacheFactory()!;
 
   if (!DATABASE_URL) {
     throw new Error("DATABASE_URL is not defined");
@@ -31,7 +29,7 @@ async function main() {
   appLogger.info("Connected to database...");
 
   appLogger.info("Setting up controller");
-  const controller = setupController(MongoDbDatabase.dbm, cache, appLogger);
+  const controller = setupController(MongoDbDatabase.dbm, appLogger);
 
   const routes = registerRestRoutes(controller, appLogger);
 

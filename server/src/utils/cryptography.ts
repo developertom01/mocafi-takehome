@@ -7,7 +7,6 @@ import {
   MONGO_DB_KEY_VAULT_NAMESPACE,
 } from "../config/app-config";
 import { Binary, ClientEncryption, MongoClient } from "mongodb";
-import { Cache } from "../internal/cache";
 
 function validateKey(key: string | Buffer, size: number = 32) {
   if (!Buffer.isBuffer(key)) {
@@ -78,37 +77,13 @@ export async function getManualEncryptionInstance(client: MongoClient) {
   return encryption;
 }
 
-async function getEncryptionKey(client: MongoClient, cache: Cache) {
-  let keyId: string;
-  if (await cache.has(DATA_KEY_FIELD_NAME)) {
-    keyId = (await cache.get(DATA_KEY_FIELD_NAME))!;
-  } else {
-    const [dbName, keyVaultName] = MONGO_DB_KEY_VAULT_NAMESPACE.split(".");
-
-    const doc = await client
-      .db(dbName)
-      .collection(keyVaultName)
-      .findOne({ keyAltNames: { $exists: true } });
-
-    keyId = doc!._id.toString("hex");
-  }
-
-  return keyId;
-}
-
-export async function encryptField(
-  client: MongoClient,
-  cache: Cache,
-  value: string
-) {
+export async function encryptField(client: MongoClient, value: string) {
   const encryption = new ClientEncryption(client, {
     keyVaultNamespace: MONGO_DB_KEY_VAULT_NAMESPACE,
     kmsProviders: await getKmsProvider(), // Should be cached
   });
-  const keyId = await getEncryptionKey(client, cache);
 
   const encryptedValue = await encryption.encrypt(value, {
-    keyId: Binary.createFromHexString(keyId),
     algorithm: "AEAD_AES_256_CBC_HMAC_SHA_512-Deterministic", // Deterministic encryption
     keyAltName: DATA_KEY_FIELD_NAME,
   });
@@ -122,6 +97,8 @@ export async function decryptField(client: MongoClient, cypher: string) {
     kmsProviders: await getKmsProvider(), // Should be cached
   });
 
-  const encryptedValue = encryption.decrypt(Binary.createFromBase64(cypher));
-  return encryptedValue;
+  const encryptedValue = await encryption.decrypt(
+    Binary.createFromBase64(cypher)
+  );
+  return encryptedValue as string;
 }

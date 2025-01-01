@@ -4,18 +4,13 @@ import {
   UserAccountController,
   UserAccountControllerType,
 } from "./user-accounts";
-import { Cache } from "../internal/cache";
 
 export interface Controller {
   userAccountController: UserAccountControllerType;
 }
 
-export function setupController(
-  db: MongoClient,
-  cache: Cache,
-  logger: Logger
-): Controller {
+export function setupController(db: MongoClient, logger: Logger): Controller {
   return {
-    userAccountController: new UserAccountController(db, cache, logger),
+    userAccountController: new UserAccountController(db, logger),
   };
 }
