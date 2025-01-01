@@ -30,7 +30,7 @@ const Modal = React.forwardRef<HTMLDialogElement, ModalProps>(
           {/* The actual dialog panel  */}
           <DialogPanel className={` bg-white p-3 min-w-72 min-h-72 ${width}`}>
             <DialogTitle className="text-2xl font-bold">{title}</DialogTitle>
-            <div className="mt-10">{children}</div>
+            <div>{children}</div>
             {/* ... */}
           </DialogPanel>
         </div>

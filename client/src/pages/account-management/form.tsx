@@ -7,6 +7,7 @@ import {
 } from "../../services/user-account.services";
 import { Button } from "../../lib/atoms";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
+import AccountInformationModal from "./modal";
 
 // 16 digits
 const CARD_NUMBER_REGEX = /^\d{16}$/;
@@ -14,24 +15,30 @@ const PIN_REGEX = /^\d{4}$/;
 
 const LoginForm = () => {
   const queryClient = useQueryClient();
-
-  const { mutate, isPending } = useMutation({
-    mutationFn: getAccountInformation,
-    mutationKey: ["user-account-info"],
-    onSuccess(data) {
-      queryClient.setQueryData(["user-account-info"], data);
-    },
-  });
-
+  const [isModalOpen, setIsModalOpen] = React.useState(false);
   const {
     register,
     handleSubmit,
     formState: { errors },
+    reset,
   } = useForm<GetUserAccountInformationPayload>();
 
   const onSubmit = (data: GetUserAccountInformationPayload) => {
     mutate(data);
   };
+
+  const { mutate, isPending, data } = useMutation({
+    mutationFn: getAccountInformation,
+    mutationKey: ["user-account-info"],
+    onSuccess(data) {
+      queryClient.setQueryData(["user-account-info"], data);
+      setIsModalOpen(true);
+      reset();
+    },
+    onError(error) {
+      console.log(error);
+    },
+  });
 
   return (
     <form
@@ -39,7 +46,7 @@ const LoginForm = () => {
       className="w-full md:w-[500px] flex flex-col px-4 gap-y-4"
     >
       <Input
-        label="Account Number"
+        label="Card Number"
         type="password"
         className="rounded-md"
         placeholder="12345678991234567"
@@ -67,6 +74,12 @@ const LoginForm = () => {
           Submit
         </Button>
       </div>
+      <AccountInformationModal
+        key={data?.id}
+        isOpen={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+        userAccount={data}
+      />
     </form>
   );
 };

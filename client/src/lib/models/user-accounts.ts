@@ -6,8 +6,7 @@ export type User = {
 
 export type Account = {
   cardNumber: string;
-  expiration: Date;
-  pin: string;
+  expiration: string;
   balance: number;
 };
 
