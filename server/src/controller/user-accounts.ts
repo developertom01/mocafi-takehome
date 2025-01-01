@@ -6,7 +6,7 @@ import { APP_SECRET, DATABASE_NAME } from "../config/app-config";
 import { handleDataLayerError } from "./util";
 import { ValidationError } from "../errors/validation-error";
 import { NotFoundError } from "../errors/not-found";
-import { verifyHash } from "../utils/cryptography";
+import { hash, verifyHash } from "../utils/cryptography";
 import { UnauthorizedError } from "../errors/Unauthorized-error";
 import UserAccountResource from "../resource/user-account-resource";
 
@@ -128,6 +128,9 @@ export class UserAccountController implements UserAccountControllerType {
 
     const { user, account } = data;
 
+    account.pin = hash(account.pin, APP_SECRET!);
+    account.expiration.setHours(23, 59, 59, 999); // Set to end of day
+
     const userAccount: UserAccount = {
       user,
       account,
@@ -138,10 +141,6 @@ export class UserAccountController implements UserAccountControllerType {
         .db(DATABASE_NAME)
         .collection<UserAccount>(USER_ACCOUNT_COLLECTION_NAME)
         .insertOne(userAccount);
-
-      if (!result.insertedId) {
-        throw new Error("Failed to create user account");
-      }
 
       const account = await this.db
         .db(DATABASE_NAME)
