@@ -1,5 +1,4 @@
 import request from "supertest";
-
 import { AsyncLocalStorage } from "async_hooks";
 import { LocalStorage } from "../../src/utils/types";
 import {
@@ -11,36 +10,34 @@ import MongoDbDatabase from "../../src/internal/database";
 import { setupController } from "../../src/controller";
 import { registerRestRoutes } from "../../src/app/rest";
 import { ExpressRestServer } from "../../src/internal/rest-server";
-import { UserAccount } from "../../src/controller/user-accounts";
-import { hash } from "../../src/utils/cryptography";
-import { getMockedCache, mockedLogger } from "../../src/utils/test-utils";
+import {
+  GetUserCardInfoPayload,
+  UserAccount,
+} from "../../src/controller/user-accounts";
+import { encryptField, hash } from "../../src/utils/cryptography";
+import { getMockLogger } from "./utils";
 
 describe("User Account Integration Test", () => {
   beforeEach(async () => {
+    const [logger, logs] = getMockLogger();
     const localStorage = new AsyncLocalStorage<LocalStorage>();
     await MongoDbDatabase.instantiate(DATABASE_URL!);
-    mockedLogger.info("Initialized database...");
-
-    const cahce = getMockedCache();
 
     await MongoDbDatabase.connect();
-    const controller = setupController(
-      MongoDbDatabase.dbm,
-      cahce,
-      mockedLogger
-    );
+    const controller = setupController(MongoDbDatabase.dbm, logger);
 
-    const routes = registerRestRoutes(controller, mockedLogger);
+    const routes = registerRestRoutes(controller, logger);
 
-    const restServer = new ExpressRestServer(
-      routes,
-      localStorage,
-      mockedLogger
-    );
+    const restServer = new ExpressRestServer(routes, localStorage, logger);
+    restServer.app.use((req, _, next) => {
+      logger.info({ req });
+      next();
+    });
 
     expect.setState({
       app: restServer.app,
       database: MongoDbDatabase.dbm,
+      logs,
     });
   });
 
@@ -52,15 +49,15 @@ describe("User Account Integration Test", () => {
   });
 
   test("/user-account/info", async () => {
-    const { app, database } = expect.getState();
+    const { app, database, logs } = expect.getState();
     // Insert a user account
     const expiration = new Date();
     expiration.setFullYear(expiration.getFullYear() + 1);
 
-    const payload: UserAccount = {
+    const account: UserAccount = {
       account: {
         balance: 10,
-        cardNumber: "1234567890123456",
+        cardNumber: await encryptField(database, "1234567890123456"),
         expiration,
         pin: hash("1234", APP_SECRET!),
       },
@@ -74,8 +71,33 @@ describe("User Account Integration Test", () => {
     await database
       .db(DATABASE_NAME)
       .collection("user-accounts")
-      .insertOne(payload);
-      
-    await request(app).get("/user-account/info").expect(200);
+      .insertOne(account);
+
+    const payload: GetUserCardInfoPayload = {
+      cardNumber: "1234567890123456",
+      pin: "1234",
+    };
+
+    const expectedUserIfo = {
+      phone: "1234567890",
+      firstName: "John",
+      lastName: "Doe",
+    };
+    const expectedAccountInfo = {
+      cardNumber: "1234567890123456",
+      expiration: `${expiration.getMonth() + 1}${expiration.getFullYear()}`,
+      balance: 10,
+    };
+
+    const response = await request(app)
+      .post("/api/user-accounts/info")
+      .send(payload)
+      .expect(200);
+
+    expect(logs).toMatchSnapshot();
+    expect(response.body).toMatchObject({
+      user: expectedUserIfo,
+      account: expectedAccountInfo,
+    });
   });
 });
