@@ -90,12 +90,13 @@ export class UserAccountController implements UserAccountControllerType {
     }
 
     const { cardNumber, pin } = data;
+    const encryptedCardNumber = await encryptField(this.db, cardNumber);
 
     try {
       const userAccount = await this.db
         .db(DATABASE_NAME)
         .collection<UserAccount>(USER_ACCOUNT_COLLECTION_NAME)
-        .findOne({ cardNumber });
+        .findOne({ "account.cardNumber": encryptedCardNumber });
 
       if (!userAccount) {
         this.logger.error("User account not found");
@@ -116,7 +117,7 @@ export class UserAccountController implements UserAccountControllerType {
     } catch (error) {
       this.logger.error(
         { "db.collection": USER_ACCOUNT_COLLECTION_NAME, error: error },
-        "Failed to find user account by card number"
+        (error as Error).message ?? "Failed to get user account"
       );
       const err = handleDataLayerError(error as Error);
       throw err;
@@ -140,6 +141,7 @@ export class UserAccountController implements UserAccountControllerType {
 
     account.pin = hash(account.pin, APP_SECRET!);
     account.cardNumber = await encryptField(this.db, account.cardNumber);
+
     account.expiration.setHours(23, 59, 59, 999); // Set to end of day
 
     const userAccount: UserAccount = {

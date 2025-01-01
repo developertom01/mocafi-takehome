@@ -12,9 +12,9 @@ const userSchema = {
 
 const accountSchema = {
   bsonType: "object",
-  required: ["accountNumber", "accountbsonType", "balance"],
+  required: ["accountNumber", "expiration", "pin", "balance"],
   properties: {
-    cardNumber: { bsonType: "string" },
+    cardNumber: { bsonType: "binData" },
     expiration: { bsonType: "date" },
     pin: { bsonType: "string" },
     balance: { bsonType: "number" },

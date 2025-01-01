@@ -6,8 +6,8 @@ async function createUserAccountCardNumberIndex(db: MongoClient) {
     .collection("user-accounts");
 
   await partyCollection.createIndex(
-    { cardNumber: 1 },
-    { unique: true, name: "user-account-card-number-idx" }
+    { "account.cardNumber": 1 },
+    { name: "user-account-card-number-idx", unique: true }
   );
 }
 

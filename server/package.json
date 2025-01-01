@@ -5,7 +5,7 @@
     "start": "nodemon --config nodemon.json",
     "dev": "docker-compose up --build -d",
     "test": "jest --config jest.config.ts",
-    "migrate:collection": "ts-node ./bin/generate-key.ts && ts-node ./bin/encription-setup.ts && ts-node ./bin/collection.ts && ts-node ./bin/indexes.ts"
+    "migrate:collection": "ts-node ./bin/generate-key.ts && ts-node ./bin/encription-setup.ts && ts-node ./bin/collection.ts && ts-node ./bin/indexes.ts && ts-node ./bin/seed.ts"
   },
   "keywords": [],
   "author": "",

@@ -26,7 +26,7 @@ export function hash(data: string, secretKey: string) {
 export function verifyHash(plainText: string, hash: string, secretKey: string) {
   const newHash = createHmac("sha256", secretKey).update(plainText).digest();
 
-  return timingSafeEqual(newHash, Buffer.from(hash));
+  return timingSafeEqual(newHash, Buffer.from(hash, "hex"));
 }
 
 export async function getEncryptionMastKey(filePath: string) {
@@ -68,7 +68,7 @@ export async function getKmsProvider() {
     : await getLocalKmsProvider();
 }
 
-export async function getManualEncryptionInstance(client: MongoClient) {
+async function getManualEncryptionInstance(client: MongoClient) {
   const encryption = new ClientEncryption(client, {
     keyVaultNamespace: MONGO_DB_KEY_VAULT_NAMESPACE,
     kmsProviders: await getKmsProvider(), // Should be cached
@@ -78,10 +78,7 @@ export async function getManualEncryptionInstance(client: MongoClient) {
 }
 
 export async function encryptField(client: MongoClient, value: string) {
-  const encryption = new ClientEncryption(client, {
-    keyVaultNamespace: MONGO_DB_KEY_VAULT_NAMESPACE,
-    kmsProviders: await getKmsProvider(), // Should be cached
-  });
+  const encryption = await getManualEncryptionInstance(client);
 
   const encryptedValue = await encryption.encrypt(value, {
     algorithm: "AEAD_AES_256_CBC_HMAC_SHA_512-Deterministic", // Deterministic encryption
@@ -92,13 +89,10 @@ export async function encryptField(client: MongoClient, value: string) {
 }
 
 export async function decryptField(client: MongoClient, cypher: string) {
-  const encryption = new ClientEncryption(client, {
-    keyVaultNamespace: MONGO_DB_KEY_VAULT_NAMESPACE,
-    kmsProviders: await getKmsProvider(), // Should be cached
-  });
+  const encryption = await getManualEncryptionInstance(client);
 
   const encryptedValue = await encryption.decrypt(
-    Binary.createFromBase64(cypher)
+    Binary.createFromBase64(cypher, 6)
   );
   return encryptedValue as string;
 }

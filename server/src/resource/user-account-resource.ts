@@ -19,6 +19,10 @@ export type UserAccountType = {
   account: AccountType;
 };
 
+function formatExpiration(expiration: Date) {
+  return `${expiration.getMonth() + 1}${expiration.getFullYear()}`; // MMYY, MM is 1-based
+}
+
 export class UserAccountResource implements Resource<UserAccountType> {
   constructor(private readonly userAccount: UserAccount) {}
 
@@ -32,7 +36,7 @@ export class UserAccountResource implements Resource<UserAccountType> {
       },
       account: {
         cardNumber: this.userAccount.account.cardNumber,
-        expiration: this.userAccount.account.expiration.toISOString(),
+        expiration: formatExpiration(this.userAccount.account.expiration),
         balance: this.userAccount.account.balance,
       },
     };
