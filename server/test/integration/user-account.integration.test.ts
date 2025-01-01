@@ -85,8 +85,8 @@ describe("User Account Integration Test", () => {
     };
     const expectedAccountInfo = {
       cardNumber: "1234567890123456",
-      expiration: `${expiration.getMonth() + 1}${expiration.getFullYear()}`,
-      balance: 10,
+      expiration: "01/26",
+      balance: (10).toFixed(2),
     };
 
     const response = await request(app)

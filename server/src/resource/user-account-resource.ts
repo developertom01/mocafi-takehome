@@ -1,4 +1,5 @@
 import { UserAccount } from "../controller/user-accounts";
+import { format } from "date-fns";
 import { Resource } from "./resource";
 
 export type UserType = {
@@ -10,7 +11,7 @@ export type UserType = {
 export type AccountType = {
   cardNumber: string;
   expiration: string;
-  balance: number;
+  balance: string;
 };
 
 export type UserAccountType = {
@@ -18,10 +19,6 @@ export type UserAccountType = {
   user: UserType;
   account: AccountType;
 };
-
-function formatExpiration(expiration: Date) {
-  return `${expiration.getMonth() + 1}${expiration.getFullYear()}`; // MMYY, MM is 1-based
-}
 
 export class UserAccountResource implements Resource<UserAccountType> {
   constructor(private readonly userAccount: UserAccount) {}
@@ -36,8 +33,8 @@ export class UserAccountResource implements Resource<UserAccountType> {
       },
       account: {
         cardNumber: this.userAccount.account.cardNumber,
-        expiration: formatExpiration(this.userAccount.account.expiration),
-        balance: this.userAccount.account.balance,
+        expiration: format(this.userAccount.account.expiration, "MM/yy"),
+        balance: this.userAccount.account.balance.toFixed(2),
       },
     };
   }
