@@ -15,6 +15,8 @@ A simple application that allows Mocafi users to enter their credit card informa
 
 - **Credit Card Encryption:** All credit card information is **encrypted** in the database using [MongoDB Client-Side Field Level Encryption (CSFLE)](https://www.mongodb.com/docs/manual/core/queryable-encryption/about-qe-csfle/).
 - **PIN Hashing:** PINs are **hashed** on the server since they only need to be compared and not decrypted.
+- Server -> Client communication will rely on https/tls encryption to keep payload secured.
+  **Out of scope:** End to end encryption can be implemented to ensure an additional layer of security for payload if it is needed
 
 ---
 
