@@ -2,40 +2,121 @@
 
 A simple application that allows Mocafi users to enter their credit card information to retrieve the account information.
 
-## Key Considereation for the app
+## Key Considerations for the App
 
-- Easy to use (Simplicity)
-- Data security (To be PCI-DSS compliant)
+- **Ease of Use (Simplicity):** Focused on a user-friendly interface.
+- **Data Security:** Designed to be **PCI-DSS compliant** to ensure data protection.
 
-## Direction of use
+## Directions for Use
 
-- Provide an account information (card number and PIN) and account information is provided
+- Provide account information (**card number and PIN**) to retrieve account details.
 
-## Security Feature
+## Security Features
 
-- All credit card information are encrypted in the database, using [MongoDb Client Side Field encryption](https://www.mongodb.com/docs/manual/core/queryable-encryption/about-qe-csfle/)
-- Pin has hashed on the server because they don't have to be decrypted but only compare to.
+- **Credit Card Encryption:** All credit card information is **encrypted** in the database using [MongoDB Client-Side Field Level Encryption (CSFLE)](https://www.mongodb.com/docs/manual/core/queryable-encryption/about-qe-csfle/).
+- **PIN Hashing:** PINs are **hashed** on the server since they only need to be compared and not decrypted.
 
-## PCI-DSS Compliant
+---
 
-Current Solution
+## Development Setup
 
-- AES encrypt card number
-- Hmac hash pin
+### Server
 
-### Issues
+#### Requirements
 
-- Indexing encrypted card number is not efficient since it is a lookup field
-- Issue with scalability (If we have to encode and decode 1M card info per sec), considering Nodejs single thread nature.
+- **Docker**
+- **Node.js 20.x.x or later** (Optional for local development)
 
-### Solution
+#### Server Scripts
 
-a. Use tokenization, a better and efficient way to be PCI-DSS compliant (Requires external system - Cannot cover in this project)
+1. Navigate to the Server folder:
 
-### Compromised solution
+```sh
+cd server
+```
 
-- Encrypt AES with 256-bit key for card number and store in database
-  To make lookup, encrypt plain card number.
-- Even though making this lookup will be slow and not efficient at the db level, we can
+2. Set up environment variables:
 
-### lOOKUP IN SEARCH STRING
+```sh
+cp .env.example .env
+```
+
+3. Start the development server:
+
+```sh
+npm run dev
+```
+
+**Purpose of Script:**
+
+- **Encryption Setup:**
+  - Creates **encryption master key** if it does not exist (`master.txt`).
+  - Sets up **Data Encryption Key (DEK)** for **MongoDB Client-Side Field Level Encryption (CSFLE)**.
+- **Database Initialization:**
+  - Creates **collections** with the required schema.
+  - Establishes **indexes** and **constraints**.
+- **Development Server Launch:**
+  - Starts the Express.js development server.
+
+**Available Endpoints:**
+
+1. **Swagger API Documentation:**
+   ```
+   http://localhost:3000/api-doc
+   ```
+2. **MongoDB Visualizer:**
+   ```
+   http://localhost:8081
+   ```
+
+### Client
+
+#### Requirements
+
+- **Node.js 20.x.x or later**
+
+#### Client Scripts
+
+1. Navigate to the Client folder:
+
+```sh
+cd client
+```
+
+2. Install dependencies:
+
+```sh
+npm install
+```
+
+3. Start the development server:
+
+```sh
+npm start
+```
+
+**Access the Client:**
+
+```
+http://localhost:3001
+```
+
+---
+
+## Manual Test Experience
+
+On application startup, **sample data** is seeded in the database (see `server/bin/seed.ts`).
+
+### Test Credentials:
+
+1. **PIN:** "1234"  
+   **Card Number:** "0234567890724456"
+
+2. **PIN:** "1234"  
+   **Card Number:** "1734567890103458"
+
+3. **PIN:** "1234"  
+   **Card Number:** "1834567890103456"
+
+**Conclusion:**
+The application meets the basic requirements for **PCI-DSS compliance** and offers a straightforward experience for users. The listed enhancements can further improve scalability, security, and maintainability for larger deployments.
