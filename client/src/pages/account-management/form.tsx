@@ -67,6 +67,7 @@ const LoginForm = () => {
 
   return (
     <form
+      data-testid="account-info-form"
       onSubmit={handleSubmit(onSubmit)}
       className="w-full md:w-[500px] flex flex-col px-4 gap-y-4"
     >
@@ -75,6 +76,7 @@ const LoginForm = () => {
       )}
       <Input
         label="Card Number"
+        data-testId="card-number"
         type="password"
         className="rounded-md"
         placeholder="12345678991234567"
@@ -87,6 +89,7 @@ const LoginForm = () => {
       />
       <Input
         label="Pin"
+        data-testId="pin"
         type="password"
         className="rounded-md"
         placeholder="xxxx"
@@ -98,7 +101,12 @@ const LoginForm = () => {
       />
       <div className="flex w-full">
         <div className="w-[30%]"></div>
-        <Button disabled={isPending} type="submit" className="w-full">
+        <Button
+          data-testId="submit-form"
+          disabled={isPending}
+          type="submit"
+          className="w-full"
+        >
           Submit
         </Button>
       </div>
