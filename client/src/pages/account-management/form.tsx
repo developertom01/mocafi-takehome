@@ -8,6 +8,7 @@ import {
 import { Button } from "../../lib/atoms";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import AccountInformationModal from "./modal";
+import { handleHttpError } from "../../lib/utils/error-handler";
 
 // 16 digits
 const CARD_NUMBER_REGEX = /^\d{16}$/;
@@ -16,10 +17,12 @@ const PIN_REGEX = /^\d{4}$/;
 const LoginForm = () => {
   const queryClient = useQueryClient();
   const [isModalOpen, setIsModalOpen] = React.useState(false);
+
   const {
     register,
     handleSubmit,
     formState: { errors },
+    setError,
     reset,
   } = useForm<GetUserAccountInformationPayload>();
 
@@ -36,7 +39,29 @@ const LoginForm = () => {
       reset();
     },
     onError(error) {
-      console.log(error);
+      const errorData = handleHttpError(error);
+      console.log(errorData);
+      if (errorData.data) {
+        setError("cardNumber", {
+          type: "manual",
+          message: errorData.data.cardNumber,
+        });
+        setError("pin", {
+          type: "manual",
+          message: errorData.data.pin,
+        });
+        if (errorData.data.message) {
+          setError("root", {
+            type: "manual",
+            message: errorData.data.message,
+          });
+        }
+      } else {
+        setError("root", {
+          type: "manual",
+          message: errorData.message,
+        });
+      }
     },
   });
 
@@ -45,6 +70,9 @@ const LoginForm = () => {
       onSubmit={handleSubmit(onSubmit)}
       className="w-full md:w-[500px] flex flex-col px-4 gap-y-4"
     >
+      {errors && (
+        <p className="text-red-500 text-center">{errors.root?.message}</p>
+      )}
       <Input
         label="Card Number"
         type="password"
