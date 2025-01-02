@@ -5,6 +5,7 @@
     "start": "nodemon --config nodemon.json",
     "dev": "docker-compose up --build -d",
     "test": "jest --config jest.config.ts",
+    "test:container": "DEBUG=* docker exec -it server npm run test",
     "migrate:collection": "ts-node ./bin/generate-key.ts && ts-node ./bin/encription-setup.ts && ts-node ./bin/collection.ts && ts-node ./bin/indexes.ts && ts-node ./bin/seed.ts"
   },
   "keywords": [],

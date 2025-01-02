@@ -58,6 +58,12 @@ npm run dev
 - **Development Server Launch:**
   - Starts the Express.js development server.
 
+4. Run test (Best suggestion is to run test in the running docker container)
+
+```sh
+   npm run test:container
+```
+
 **Available Endpoints:**
 
 1. **Swagger API Documentation:**
