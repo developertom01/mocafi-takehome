@@ -118,5 +118,13 @@ On application startup, **sample data** is seeded in the database (see `server/b
 3. **PIN:** "1234"  
    **Card Number:** "1834567890103456"
 
+**Development issue:**
+
+To understand thought process during development and how I resolved issues, checkout these issues on the PR
+
+- [Auto-Encryption with MongoDB Client Encryption Not Working](https://github.com/developertom01/mocafi-takehome/issues/2)
+- [MongoDB Client-Side Field Level Encryption (CSFLE) Failure](https://github.com/developertom01/mocafi-takehome/issues/1)
+
 **Conclusion:**
+
 The application meets the basic requirements for **PCI-DSS compliance** and offers a straightforward experience for users.
