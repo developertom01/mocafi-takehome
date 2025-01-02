@@ -64,6 +64,8 @@ npm run dev
    npm run test:container
 ```
 
+After this run `npm run dev` if you want to run the application manually to recreate application database (Test drops database)
+
 **Available Endpoints:**
 
 1. **Swagger API Documentation:**
@@ -107,6 +109,11 @@ npm start
 http://localhost:3001
 ```
 
+4. Run test
+
+```sh
+ npm run test
+```
 ---
 
 ## Manual Test Experience
