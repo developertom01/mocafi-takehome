@@ -119,4 +119,4 @@ On application startup, **sample data** is seeded in the database (see `server/b
    **Card Number:** "1834567890103456"
 
 **Conclusion:**
-The application meets the basic requirements for **PCI-DSS compliance** and offers a straightforward experience for users. The listed enhancements can further improve scalability, security, and maintainability for larger deployments.
+The application meets the basic requirements for **PCI-DSS compliance** and offers a straightforward experience for users.
