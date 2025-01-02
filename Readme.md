@@ -114,6 +114,7 @@ http://localhost:3001
 ```sh
  npm run test
 ```
+
 ---
 
 ## Manual Test Experience
@@ -137,6 +138,14 @@ To understand thought process during development and how I resolved issues, chec
 
 - [Auto-Encryption with MongoDB Client Encryption Not Working](https://github.com/developertom01/mocafi-takehome/issues/2)
 - [MongoDB Client-Side Field Level Encryption (CSFLE) Failure](https://github.com/developertom01/mocafi-takehome/issues/1)
+
+## Technologies Used
+
+- DB: Mongodb
+- Language: Typescript (server and client) running on Nodejs 20.x.x or later
+- Docker & Docker compose
+- Http Server: Expressjs
+- Frontend Library: React
 
 **Conclusion:**
 
