@@ -6,6 +6,9 @@ export default class MongoDbDatabase {
   private static _client: MongoClient;
 
   public static async instantiate(uri: string) {
+    if (this._client) {
+      return;
+    }
     // Create a new client with auto-encryption
     const secureClient = new MongoClient(uri, {
       appName: APP_NAME,
