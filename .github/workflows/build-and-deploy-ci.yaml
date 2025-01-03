@@ -29,6 +29,7 @@ jobs:
 
       - name: Run tests
         run: |
+          docker-compose -f server/docker-compose.ci.yaml up -d
           until docker exec server curl -f http://localhost:3000; do
             echo "Tests failed, retrying..."
             sleep 5s
