@@ -26,3 +26,10 @@ services:
       - .:/opt/app
     depends_on:
       - db
+    environment:
+      - DB_CONNECTION_STRING=${DB_CONNECTION_STRING}
+      - DATABASE_NAME=${DATABASE_NAME}
+      - MASTER_KEY=${MASTER_KEY}
+      - MONGO_DB_KEY_VAULT_NAMESPACE=${MONGO_DB_KEY_VAULT_NAMESPACE}
+      - APP_SECRET=${APP_SECRET}
+      - DATABASE_SECRET=${DATABASE_SECRET}
