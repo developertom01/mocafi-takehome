@@ -9,7 +9,7 @@ jobs:
   test-server:
     env:
       DATABASE_NAME: mocafi-db
-      DB_CONNECTION_STRING: mongodb://root:example@db:27017/mocafi-db?authSource=admin
+      DB_CONNECTION_STRING: mongodb://root:example@localhost:27017/mocafi-db?authSource=admin
       PORT: 3000
       APP_URL: http://localhost:3000
       APP_SECRET: 45ddbeb7ce0b195d592c9e37f46854498f637e7b8747540f192893fd9230d905
@@ -22,25 +22,19 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v3
 
-      - name: Setup docker compose
-        uses: KengoTODA/actions-setup-docker-compose@v1
+      - name: setup node
+        uses: actions/setup-node@v4
         with:
-          version: '2.14.2'
+          node-version: 20
+
+      - name: Install dependencies
+        run: |
+          docker-compose -f server/docker-compose.ci.yaml up -d db migrate
+          npm install
 
       - name: Run tests
         run: |
-          docker-compose -f server/docker-compose.ci.yaml up -d
-          count=0
-          until docker exec server curl -f http://localhost:3000; do
-            if [ $count -gt 15 ]; then
-              echo "Server failed to start"
-              exit 1
-            fi
-            count=$((count+1))
-            echo "Waiting for server to start..."
-            sleep 5s
-          done
-          docker exec server npm run test
+          npm run test
 
   test-client:
     runs-on: ubuntu-latest
