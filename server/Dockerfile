@@ -1,4 +1,4 @@
-FROM node:20-slim
+FROM node:20-slim AS build
 
 # Set the working directory
 WORKDIR /opt/app
@@ -20,7 +20,7 @@ COPY ./tsconfig.json ./tsconfig.json
 
 RUN npm run build
 
-FROM node:20-slim
+FROM node:20-slim AS production
 
 WORKDIR /opt/app
 
