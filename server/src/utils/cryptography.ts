@@ -30,6 +30,9 @@ export function verifyHash(plainText: string, hash: string, secretKey: string) {
 }
 
 export async function getEncryptionMastKey(filePath: string) {
+  if (process.env.MASTER_KEY) {
+    return process.env.MASTER_KEY;
+  }
   if (APP_ENV === "production") return;
 
   try {
