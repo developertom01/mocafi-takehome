@@ -31,7 +31,7 @@ jobs:
         run: |
           docker compose -f server/docker-compose.ci.yaml up -d
           sleep 6s
-          docker exec -T server npm run test
+          docker exec server npm run test
 
   test-client:
     runs-on: ubuntu-latest
