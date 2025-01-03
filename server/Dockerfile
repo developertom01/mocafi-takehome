@@ -24,9 +24,10 @@ FROM node:20-slim AS production
 
 WORKDIR /opt/app
 
+# Copy package.json and package-lock.json
+COPY package.json ./package.json
+COPY package-lock.json ./package-lock.json
 
-COPY package.json ./
-COPY package.lock.json ./
 
 
 # Install only production dependencies
