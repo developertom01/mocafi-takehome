@@ -31,7 +31,7 @@ jobs:
         run: |
           docker-compose -f server/docker-compose.ci.yaml up -d
           until docker exec server curl -f http://localhost:3000; do
-            echo "Tests failed, retrying..."
+            echo "Waiting for server to start..."
             sleep 5s
           done
           docker exec server npm run test
