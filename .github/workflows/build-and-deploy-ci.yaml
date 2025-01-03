@@ -17,7 +17,7 @@ jobs:
       MONGO_DB_KEY_VAULT_NAMESPACE: encryption.__KeyVault
 
     runs-on: ubuntu-latest
-    name: Test
+    name: Test server
     steps:
       - name: Checkout
         uses: actions/checkout@v3
@@ -25,7 +25,7 @@ jobs:
       - name: Setup docker compose
         uses: hoverkraft-tech/compose-action@v2.0.1
         with:
-          compose-version: server/docker-compose.yaml
+          compose-file: server/docker-compose.yaml
 
       - name: Start containers
         run: docker-compose -f server/docker-compose.yaml up --build -d db migrate app
@@ -35,7 +35,7 @@ jobs:
 
   test-client:
     runs-on: ubuntu-latest
-    name: Test
+    name: Test client
     steps:
       - name: Checkout
         uses: actions/checkout@v3
@@ -46,7 +46,9 @@ jobs:
           node-version: 20
 
       - name: Install dependencies
-        run: npm install
+        run: |
+          cd client
+          npm install
 
       - name: Run tests
         run: npm run test
