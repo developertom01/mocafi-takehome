@@ -14,7 +14,7 @@ provider "linode" {
 
 locals { 
    region = "us-east"
-   instance_label = "mocafi-server"
+   instance_label = var.instance_label
    instance_type = "g6-nanode-1" // 1 vCPU, 1GB RAM, 25GB Storage
    instance_image = "linode/ubuntu20.04"
 }

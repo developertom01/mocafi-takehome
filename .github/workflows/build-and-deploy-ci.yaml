@@ -157,4 +157,5 @@ jobs:
           TF_VAR_database_name: ${{ secrets.DATABASE_NAME }}
           TF_VAR_linode_token: ${{ secrets.LINODE_TOKEN }}
           TF_VAR_mongo_vault_namespace: ${{ secrets.MONGO_DB_KEY_VAULT_NAMESPACE }}
+          TF_VAR_instance_label: mocafi-server-${{ github.run_id }}
           APP_PORT: 3000

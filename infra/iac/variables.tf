@@ -42,3 +42,9 @@ variable "mongo_vault_namespace"  {
     description = "The namespace for the mongo vault"
     sensitive = true
 }
+
+variable "instance_label" {
+    type = string
+    description = "The label for the instance"
+  
+}
