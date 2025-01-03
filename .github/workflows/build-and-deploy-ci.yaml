@@ -32,7 +32,7 @@ jobs:
           docker-compose -f server/docker-compose.ci.yaml up -d
           count=0
           until docker exec server curl -f http://localhost:3000; do
-            if [ $count -gt 5 ]; then
+            if [ $count -gt 10 ]; then
               echo "Server failed to start"
               exit 1
             fi
