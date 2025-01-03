@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "scripts": {
     "start": "nodemon --config nodemon.json",
-    "dev": "docker-compose -f docker-compose.dev.yaml up --build -d",
+    "dev": "docker-compose -f docker-compose.yaml up --build -d",
     "test": "jest --config jest.config.ts",
     "test:container": "DEBUG=* docker exec -it server npm run test",
     "migrate:collection": "ts-node ./bin/generate-key.ts && ts-node ./bin/encription-setup.ts && ts-node ./bin/collection.ts && ts-node ./bin/indexes.ts && ts-node ./bin/seed.ts"
