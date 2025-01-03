@@ -31,7 +31,6 @@ systemctl start docker
 # Add user to Docker group
 echo "Adding user to Docker group..."
 sudo usermod -aG docker $USER
-newgrp docker
 
 # Allow ports 80 and 443 through the firewall
 echo "Configuring firewall rules..."
