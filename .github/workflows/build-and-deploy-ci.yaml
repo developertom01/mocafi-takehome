@@ -25,13 +25,12 @@ jobs:
       - name: Setup docker compose
         uses: hoverkraft-tech/compose-action@v2.0.1
         with:
-          compose-file: server/docker-compose.yaml
-
-      - name: Start containers
-        run: docker-compose -f server/docker-compose.yaml up --build -d db migrate app
+          compose-file: server/docker-compose.ci.yaml
+          services: app db migrate
+          up-flags: --build -d
 
       - name: Run tests
-        run: DEBUG=* docker exec -it server npm run test
+        run: docker exec -it server npm run test
 
   test-client:
     runs-on: ubuntu-latest

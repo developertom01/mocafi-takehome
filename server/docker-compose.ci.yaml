@@ -6,8 +6,6 @@ services:
     build:
       context: .
       dockerfile: Dockerfile.dev
-    env_file:
-      - .env
     volumes:
       - .:/opt/app
     depends_on:
@@ -50,8 +48,6 @@ services:
     build:
       context: .
       dockerfile: Dockerfile.migrate
-    env_file:
-      - .env
     volumes:
       - .:/opt/app
     depends_on:
