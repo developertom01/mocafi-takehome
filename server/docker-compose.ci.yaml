@@ -30,18 +30,6 @@ services:
       timeout: 5s
       retries: 5
 
-  mongo-express:
-    image: mongo-express
-    restart: always
-    container_name: mongo-express
-    environment:
-      ME_CONFIG_MONGODB_ADMINUSERNAME: root
-      ME_CONFIG_MONGODB_ADMINPASSWORD: example
-      ME_CONFIG_MONGODB_URL: ${DB_CONNECTION_STRING}
-    ports:
-      - 8081:8081
-    depends_on:
-      - db
 
   migrate:
     container_name: extension-migrate

@@ -1,9 +1,9 @@
 name: build-and-deploy-ci
 
 on:
-  release:
-    types:
-      - created
+  push:
+    branches:
+      - main
 
 jobs:
   test-server:
@@ -26,7 +26,6 @@ jobs:
         uses: hoverkraft-tech/compose-action@v2.0.1
         with:
           compose-file: server/docker-compose.ci.yaml
-          services: app db migrate
           up-flags: --build -d
 
       - name: Run tests
