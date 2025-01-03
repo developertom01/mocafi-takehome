@@ -116,7 +116,6 @@ jobs:
         uses: hashicorp/setup-terraform@v3
         with:
           terraform_version: "1.1.7"
-          cli_config_credentials_token: ${{ secrets.TF_API_TOKEN }}
 
       - name: Terraform Init
         run: terraform -chdir=infra/iac init
@@ -130,4 +129,5 @@ jobs:
           TF_VAR_mongo_db_key_vault_namespace: ${{ secrets.MONGO_DB_KEY_VAULT_NAMESPACE }}
           TF_VAR_db_connection_string: ${{ secrets.DB_CONNECTION_STRING }}
           TF_VAR_database_name: ${{ secrets.DATABASE_NAME }}
+          TF_VAR_linode_token: ${{ secrets.LINODE_TOKEN }}
           APP_PORT: 3000
