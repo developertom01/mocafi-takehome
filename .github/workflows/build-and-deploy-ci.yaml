@@ -51,7 +51,9 @@ jobs:
           npm install
 
       - name: Run tests
-        run: npm run test
+        run: |
+          cd client
+          npm run test
 
   build-and-push-server-container:
     runs-on: ubuntu-latest
