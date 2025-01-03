@@ -30,7 +30,7 @@ jobs:
       - name: Run tests
         run: |
           docker compose -f server/docker-compose.ci.yaml up -d
-          sleep 6s
+          sleep 10s
           docker exec server npm run test
 
   test-client:
