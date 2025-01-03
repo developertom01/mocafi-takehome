@@ -20,7 +20,7 @@ variable "database_name" {
     description = "The name of the database"
 }
 
-variable "app_secrete" {
+variable "app_secret" {
     type = string
     description = "The secret for the app"
     sensitive = true

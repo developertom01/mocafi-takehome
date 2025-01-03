@@ -48,7 +48,7 @@ echo "Setting up environment variables..."
 cat <<EOF >> ~/.bashrc
 export DB_CONNECTION_STRING="$var.db_connection_string"
 export DATABASE_NAME="$var.database_name"
-export APP_SECRET="$var.app_secrete"
+export APP_SECRET="$var.app_secret"
 export APP_PORT="$var.app_port"
 export DATABASE_SECRET="$var.database_secret"
 export MONGO_DB_KEY_VAULT_NAMESPACE="$var.mongo_vault_namespace"
