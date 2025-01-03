@@ -1,9 +1,9 @@
 name: build-and-deploy-ci
 
 on:
-  push:
-    branches:
-      - release:v*
+  release:
+    types:
+      - created
 
 jobs:
   test-server:
