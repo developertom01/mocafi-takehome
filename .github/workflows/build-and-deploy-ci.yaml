@@ -146,7 +146,9 @@ jobs:
         run: terraform -chdir=infra/iac init
 
       - name: Terraform Apply
-        run: terraform -chdir=infra/iac apply -auto-approve
+        run: |
+          terraform -chdir=infra/iac destroy -auto-approve
+          terraform -chdir=infra/iac apply -auto-approve
         env:
           TF_VAR_root_password: ${{ secrets.ROOT_PASSWORD }}
           TF_VAR_app_secret: ${{ secrets.APP_SECRET }}
