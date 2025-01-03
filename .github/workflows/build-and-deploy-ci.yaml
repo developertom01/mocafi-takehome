@@ -9,7 +9,6 @@ jobs:
   test-server:
     env:
       DATABASE_NAME: mocafi-db
-      DB_CONNECTION_STRING: mongodb://root:example@127.0.0.1:27017/mocafi-db?authSource=admin
       PORT: 3000
       APP_URL: http://localhost:3000
       APP_SECRET: 45ddbeb7ce0b195d592c9e37f46854498f637e7b8747540f192893fd9230d905
@@ -26,22 +25,26 @@ jobs:
       - name: Setup docker compose
         uses: KengoTODA/actions-setup-docker-compose@v1
         with:
-          version: '2.14.2'
+          version: "2.14.2"
 
       - name: Start services
+        env:
+          DB_CONNECTION_STRING: mongodb://root:example@db/mocafi-db?authSource=admin
         run: docker-compose -f server/docker-compose.ci.yaml up -d
-      
+
       - name: Setup node 20
         uses: actions/setup-node@v4
         with:
           node-version: 20
-      
+
       - name: Install dependencies
         run: |
           cd server
           npm install
 
       - name: Run tests
+        env:
+          DB_CONNECTION_STRING: mongodb://root:example@localhost/mocafi-db?authSource=admin
         run: |
           cd server
           npm run test
