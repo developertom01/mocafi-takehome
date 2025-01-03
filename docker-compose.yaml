@@ -22,7 +22,7 @@ services:
     ports:
       - "3001:3001"
     volumes:
-      - ./nginx.conf:/etc/nginx/nginx.conf
+      - ./infra/nginx.conf:/etc/nginx/nginx.conf
     depends_on:
       - server
     networks:

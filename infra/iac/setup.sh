@@ -1,52 +1,65 @@
 #!/bin/bash
 
 # Exit script if any command fails
-set -e
+set -e -o pipefail
 
 # Update package list and upgrade system
-sudo apt update
+echo "Updating package list and upgrading system..."
+sudo apt update -y
 sudo apt upgrade -y
 
 # Install required dependencies
-sudo apt install -y apt-transport-https ca-certificates curl software-properties-common
+echo "Installing required dependencies..."
+sudo apt install -y apt-transport-https ca-certificates curl software-properties-common git ufw
 
-#   Install Docker
-curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo gpg --dearmor -o /usr/share/keyrings/docker-archive-keyring.gpg \
-    && echo "deb [arch=amd64 signed-by=/usr/share/keyrings/docker-archive-keyring.gpg] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable" | sudo tee /etc/apt/sources.list.d/docker.list > /dev/null\
-    && sudo apt update -y \
-    && sudo apt install -y docker-ce docker-ce-cli containerd.io
-    && systemctl enable docker \
-    && systemctl start docker \
-    && sudo usermod -aG docker $USER
-    && newgrp docker
+# Install Docker
+echo "Installing Docker..."
+curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo gpg --batch --yes --dearmor -o /usr/share/keyrings/docker-archive-keyring.gpg
 
+echo "Adding Docker repository..."
+echo "deb [arch=amd64 signed-by=/usr/share/keyrings/docker-archive-keyring.gpg] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable" | sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
 
+sudo apt update -y
+sudo apt install -y docker-ce docker-ce-cli containerd.io
+echo "Docker installed successfully!"
 
-# Install Docker Compose (latest version)
-COMPOSE_VERSION=$(curl -s https://api.github.com/repos/docker/compose/releases/latest | grep 'tag_name' | cut -d '"' -f 4)
-sudo curl -L "https://github.com/docker/compose/releases/download/$COMPOSE_VERSION/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose \
-    && sudo chmod +x /usr/local/bin/docker-compose
+# Enable and start Docker service
+echo "Enabling and starting Docker service..."
+systemctl enable docker
+systemctl start docker
 
+# Add user to Docker group
+echo "Adding user to Docker group..."
+sudo usermod -aG docker $USER
+newgrp docker
 
-# ALLOW PORT 80 AND 443
-sudo ufw allow 80 && sudo ufw allow 443 && sudo ufw enable
+# Allow ports 80 and 443 through the firewall
+echo "Configuring firewall rules..."
+sudo ufw allow 80
+sudo ufw allow 443
+sudo ufw --force enable
 
-# Clone App repo
-echo "Cloning app repo..."
+# Clone app repository
+echo "Cloning app repository..."
 git clone https://github.com/developertom01/mocafi-takehome
 cd mocafi-takehome
 
-// Setup environment variables
+# Setup environment variables
 echo "Setting up environment variables..."
-echo 'export DB_CONNECTION_STRING="$var.db_connection_string"' >> ~/.bashrc
-echo 'export DATABASE_NAME="$var.database_name"' >> ~/.bashrc
-echo 'export APP_SECRET="$var.app_secrete"' >> ~/.bashrc
-echo 'export APP_PORT="$var.app_port"' >> ~/.bashrc
-echo 'export DATABASE_SECRET="$var.database_secret"' >> ~/.bashrc
-echo 'export MONGO_DB_KEY_VAULT_NAMESPACE="$var.mongo_vault_namespace"' >> ~/.bashrc
+cat <<EOF >> ~/.bashrc
+export DB_CONNECTION_STRING="$var.db_connection_string"
+export DATABASE_NAME="$var.database_name"
+export APP_SECRET="$var.app_secrete"
+export APP_PORT="$var.app_port"
+export DATABASE_SECRET="$var.database_secret"
+export MONGO_DB_KEY_VAULT_NAMESPACE="$var.mongo_vault_namespace"
+EOF
 
-sources ~/.bashrc
+# Apply environment variables
+source ~/.bashrc
 
 # Start up the app
 echo "Starting up the app..."
-docker-compose up -d
+docker compose up -d
+
+echo "Setup complete!"
