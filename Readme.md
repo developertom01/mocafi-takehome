@@ -71,10 +71,13 @@ After this run `npm run dev` if you want to run the application manually to recr
 **Available Endpoints:**
 
 1. **Swagger API Documentation:**
+
    ```
    http://localhost:3000/api-doc
    ```
+
 2. **MongoDB Visualizer:**
+
    ```
    http://localhost:8081
    ```
@@ -123,7 +126,7 @@ http://localhost:3001
 
 On application startup, **sample data** is seeded in the database (see `server/bin/seed.ts`).
 
-### Test Credentials:
+### Test Credentials
 
 1. **PIN:** "1234"  
    **Card Number:** "0234567890724456"
@@ -148,6 +151,14 @@ To understand thought process during development and how I resolved issues, chec
 - Docker & Docker compose
 - Http Server: Expressjs
 - Frontend Library: React
+
+## Infrastructure
+
+- App is setup to deploy a linode server instance
+- Infrastructure is deployed with terraform IAC
+- All infrastructure code is found in the `./infra` directory
+- The `iac/infra` directory contain all the terraform config
+- `.github/workflows` contain CI/CD configuration
 
 **Conclusion:**
 
