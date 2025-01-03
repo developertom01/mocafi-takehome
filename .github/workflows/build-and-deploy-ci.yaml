@@ -29,7 +29,9 @@ jobs:
           up-flags: --build -d
 
       - name: Run tests
-        run: docker compose exec -T app npm run test
+        run: |
+          sleep 6s
+          docker compose exec -T app npm run test
 
   test-client:
     runs-on: ubuntu-latest
