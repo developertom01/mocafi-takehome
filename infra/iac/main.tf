@@ -36,8 +36,4 @@ resource "linode_instance" "mocafi-server" {
   image = local.instance_image
 
   stackscript_id = linode_stackscript.start-server.id
-  metadata {
-    user_data = base64encode(file("setup.sh"))
-  }
-
 }
