@@ -28,12 +28,10 @@ WORKDIR /opt/app
 COPY package.json ./package.json
 COPY package-lock.json ./package-lock.json
 
-
-
 # Install only production dependencies
 RUN npm i --only=production
 
-COPY --from=build /opt/app/build/* ./
+COPY --from=build /opt/app/build .
 
 
 CMD [ "node" , "bin/server.js"]
