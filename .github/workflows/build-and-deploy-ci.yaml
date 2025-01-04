@@ -132,6 +132,16 @@ jobs:
   deploy:
     runs-on: ubuntu-latest
     name: Deploy
+    env:
+      TF_VAR_root_password: ${{ secrets.ROOT_PASSWORD }}
+      TF_VAR_app_secret: ${{ secrets.APP_SECRET }}
+      TF_VAR_database_secret: ${{ secrets.DATABASE_SECRET }}
+      TF_VAR_db_connection_string: ${{ secrets.DB_CONNECTION_STRING }}
+      TF_VAR_database_name: ${{ secrets.DATABASE_NAME }}
+      TF_VAR_linode_token: ${{ secrets.LINODE_TOKEN }}
+      TF_VAR_mongo_vault_namespace: ${{ secrets.MONGO_DB_KEY_VAULT_NAMESPACE }}
+      TF_VAR_instance_label: mocafi-server-${{ github.run_id }}
+      APP_PORT: 3000    
     needs: [build-and-push-server-container, build-and-push-client-container]
     steps:
       - name: Checkout
@@ -151,13 +161,4 @@ jobs:
       - name: Terraform Apply
         run: |
           terraform -chdir=infra/iac apply -auto-approve
-        env:
-          TF_VAR_root_password: ${{ secrets.ROOT_PASSWORD }}
-          TF_VAR_app_secret: ${{ secrets.APP_SECRET }}
-          TF_VAR_database_secret: ${{ secrets.DATABASE_SECRET }}
-          TF_VAR_db_connection_string: ${{ secrets.DB_CONNECTION_STRING }}
-          TF_VAR_database_name: ${{ secrets.DATABASE_NAME }}
-          TF_VAR_linode_token: ${{ secrets.LINODE_TOKEN }}
-          TF_VAR_mongo_vault_namespace: ${{ secrets.MONGO_DB_KEY_VAULT_NAMESPACE }}
-          TF_VAR_instance_label: mocafi-server-${{ github.run_id }}
-          APP_PORT: 3000
+
