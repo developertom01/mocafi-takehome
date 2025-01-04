@@ -12,6 +12,7 @@ services:
       - APP_SECRET=${APP_SECRET}
       - DATABASE_SECRET=${DATABASE_SECRET}
       - MONGO_DB_KEY_VAULT_NAMESPACE=${MONGO_DB_KEY_VAULT_NAMESPACE}
+      - MASTER_KEY=${MASTER_KEY}
     networks:
       - app-network
 
