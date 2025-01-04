@@ -127,7 +127,7 @@ jobs:
           context: client
           file: client/Dockerfile
         env:
-          REACT_APP_API_URL: http://localhost:3000
+          REACT_APP_API_URL: http://http://45.79.168.213/:3000
 
   deploy:
     runs-on: ubuntu-latest

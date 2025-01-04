@@ -4,6 +4,8 @@ WORKDIR /app
 
 COPY package*.json ./
 
+ENV REACT_APP_API_URL=http://45.79.168.213:3000
+
 RUN npm install
 
 COPY . .
