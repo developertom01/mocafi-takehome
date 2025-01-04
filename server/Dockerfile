@@ -36,4 +36,4 @@ RUN npm i --only=production
 COPY --from=build /opt/app/build/* ./
 
 
-CMD [ "node" , "bin/index.js"]
+CMD [ "node" , "bin/server.js"]
