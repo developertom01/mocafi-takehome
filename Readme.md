@@ -18,6 +18,10 @@ A simple application that allows Mocafi users to enter their credit card informa
 - Server -> Client communication will rely on https/tls encryption to keep payload secured.
   **Out of scope:** End to end encryption can be implemented to ensure an additional layer of security for payload if it is needed
 
+# Deployed env
+
+- Access applcation on `http://45.79.168.213/`
+
 ---
 
 ## Development Setup
