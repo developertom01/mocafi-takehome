@@ -20,8 +20,6 @@ services:
     image: sarptom/mocafi-app-client:latest
     ports:
       - 80:80
-    volumes:
-      - ./infra/nginx.conf:/etc/nginx/nginx.conf
     depends_on:
       - server
     networks:
