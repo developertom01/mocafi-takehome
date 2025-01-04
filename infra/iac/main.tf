@@ -25,6 +25,7 @@ resource "linode_stackscript" "start-server" {
   images = [local.instance_image]
   description = "Starts the Mocafi server"
 
+
 }
 
 resource "linode_instance" "mocafi-server" {
@@ -35,5 +36,8 @@ resource "linode_instance" "mocafi-server" {
   image = local.instance_image
 
   stackscript_id = linode_stackscript.start-server.id
+  metadata {
+    user_data = file("setup.sh")
+  }
 
 }
