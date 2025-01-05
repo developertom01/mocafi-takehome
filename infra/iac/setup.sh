@@ -35,7 +35,7 @@ sudo usermod -aG docker $USER
 # Allow ports 80 and 443 through the firewall
 echo "Configuring firewall rules..."
 sudo ufw allow 80
-sudo ufw allow 443
+sudo ufw allow 3000 
 sudo ufw --force enable
 
 # Clone app repository

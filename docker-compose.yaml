@@ -6,15 +6,15 @@ services:
     environment:
       - NODE_ENV=development
       - DB_CONNECTION_STRING= ${DB_CONNECTION_STRING}
-      - DATABASE_NAME=mocafi
+      - DATABASE_NAME=${DATABASE_NAME}
       - PORT=3000
       - APP_URL=${APP_URL}
       - APP_SECRET=${APP_SECRET}
       - DATABASE_SECRET=${DATABASE_SECRET}
       - MONGO_DB_KEY_VAULT_NAMESPACE=${MONGO_DB_KEY_VAULT_NAMESPACE}
       - MASTER_KEY=${MASTER_KEY}
-    networks:
-      - app-network
+    ports:
+      - 3000:3000
 
   client:
     image: sarptom/mocafi-app-client:latest
@@ -22,9 +22,3 @@ services:
       - 80:80
     depends_on:
       - server
-    networks:
-      - app-network
-
-networks:
-  app-network:
-    driver: bridge
